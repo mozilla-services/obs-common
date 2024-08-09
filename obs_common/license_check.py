@@ -91,7 +91,7 @@ def has_license_header(path: pathlib.Path):
     return False
 
 
-def main(*args):
+def main(args=None):
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument(
         "-l", "--file-only", action="store_true", help="print files only"
@@ -99,7 +99,7 @@ def main(*args):
     parser.add_argument("--verbose", action="store_true", help="verbose output")
     parser.add_argument("target", help="file or directory tree to check", nargs="?")
 
-    parsed = parser.parse_args(*args)
+    parsed = parser.parse_args(args)
 
     if parsed.target:
         target = pathlib.Path(parsed.target)

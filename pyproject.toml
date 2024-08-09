@@ -8,13 +8,22 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-dependencies = []
+dependencies = [
+  "click",
+  "google-cloud-pubsub",
+  "google-cloud-storage",
+  "requests",
+  "sentry-sdk",
+]
 dynamic = ["version"]
 
 [project.scripts]
 license-check = "obs_common.license_check:main"
 service-status = "obs_common.service_status:main"
 update-obs-common = "obs_common.update_obs_common:main"
+gcs-cli = "obs_common.gcs_cli:main"
+pubsub-cli = "obs_common.pubsub_cli:main"
+sentry-wrap = "obs_common.sentry_wrap:cli_main"
 
 [build-system]
 requires = ["setuptools", "setuptools_scm[toml]>=6.2"]
@@ -22,6 +31,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.distutils.bdist_wheel]
 universal = true
+
+[tool.setuptools]
+packages = ["obs_common"]
 
 [tool.setuptools_scm]
 # Empty is fine
@@ -44,7 +56,9 @@ docstring-quotes = "double"
 [tool.ruff.lint.per-file-ignores]
 "obs_common/license_check.py" = ["S603", "S607"]
 "obs_common/release.py" = ["S603", "S607"]
-"tests/**/*.py" = ["S101"]
+"obs_common/sentry_wrap.py" = ["S603"]
+"obs_common/waitfor.py" = ["S310"]
+"tests/**/*.py" = ["S101", "S603"]
 
 
 [tool.pytest.ini_options]

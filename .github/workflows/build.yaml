@@ -36,12 +36,18 @@ jobs:
           venv/bin/ruff format --check obs_common tests
           venv/bin/ruff check obs_common tests
       - name: Run tests
+        env:
+          SENTRY_DSN: http://public@localhost:8090/1
+          STORAGE_EMULATOR_HOST: http://localhost:8001
         run: |
+          docker compose up -d fakesentry gcs-emulator
           venv/bin/pytest tests/
+          # stop services immediate and ignore errors
+          docker compose down -t0 || true
       - name: License Check
         if: ${{ matrix.python-version == '3.11' }}
         run: |
-          venv/bin/pip install -e .
+          venv/bin/pip install -e . --no-deps
           venv/bin/license-check
 
   build-and-release:

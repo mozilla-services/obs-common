@@ -1,0 +1,32 @@
+services:
+  # https://github.com/willkg/kent
+  fakesentry:
+    build:
+      context: docker/images/fakesentry
+    image: local/tecken_fakesentry
+    ports:
+      - "${EXPOSE_SENTRY_PORT:-8090}:8090"
+    command: run --host 0.0.0.0 --port 8090
+
+  # https://github.com/fsouza/fake-gcs-server
+  # Fake GCP GCS server for local development and testing
+  gcs-emulator:
+    image: fsouza/fake-gcs-server:1.49.2
+    command: -port 8001 -scheme http
+    ports:
+      - "${EXPOSE_GCS_EMULATOR_PORT:-8001}:8001"
+
+  # https://cloud.google.com/sdk/docs/downloads-docker
+  # official pubsub emulator
+  pubsub:
+    # also available as google/cloud-sdk:<version>-emulators
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:463.0.0-emulators
+    command:
+      - gcloud
+      - beta
+      - emulators
+      - pubsub
+      - start
+      - --host-port=0.0.0.0:5010
+    ports:
+      - "${EXPOSE_GCS_EMULATOR_PORT:-5010}:5010"
