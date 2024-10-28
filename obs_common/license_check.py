@@ -6,14 +6,6 @@
 
 """
 This script checks files for license headers.
-
-This requires Python 3.8+ to run.
-
-See https://github.com/willkg/socorro-release/#readme for details.
-
-repo: https://github.com/willkg/socorro-release/
-sha: $SHA$
-
 """
 
 import argparse

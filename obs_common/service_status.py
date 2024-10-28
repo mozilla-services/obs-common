@@ -7,17 +7,6 @@
 """
 This script looks at the ``/__version__`` endpoint information and tells you
 how far behind different server environments are from main tip.
-
-This requires Python 3.8+ to run. See help text for more.
-
-See https://github.com/willkg/socorro-release/#readme for details.
-
-Note: If you want to use ``pyproject.toml`` and you're using Python <3.11, this
-also requires the tomli library.
-
-repo: https://github.com/willkg/socorro-release/
-sha: $SHA$
-
 """
 
 import argparse
@@ -31,8 +20,6 @@ from urllib.request import urlopen
 DESCRIPTION = """
 service-status.py tells you how far behind different server environments
 are from main tip.
-
-For help, see: https://github.com/willkg/socorro-release/
 """
 
 DEFAULT_CONFIG = {
