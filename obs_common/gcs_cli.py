@@ -161,10 +161,5 @@ def upload(source, destination):
         click.echo(f"Uploaded gs://{bucket_name}/{key}")
 
 
-def main(argv=None):
-    argv = argv or []
-    gcs_group(argv)
-
-
 if __name__ == "__main__":
     gcs_group()
