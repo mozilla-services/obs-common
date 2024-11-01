@@ -1,9 +1,43 @@
 services:
+  shell:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        userid: ${USE_UID:-10001}
+        groupid: ${USE_GID:-10001}
+    image: local/obs-common-shell
+    env_file:
+      - docker/config/local_dev.env
+    links:
+      - fakesentry
+      - gcs-emulator
+      - pubsub
+    volumes:
+      - .:/app
+
+  devcontainer:
+    build:
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        userid: ${USE_UID:-10001}
+        groupid: ${USE_GID:-10001}
+    image: local/obs-common-devcontainer
+    entrypoint: ["sleep", "inf"]
+    env_file:
+      - docker/config/local_dev.env
+    links:
+      - fakesentry
+      - gcs-emulator
+      - pubsub
+    volumes:
+      - .:/app
+
   # https://github.com/willkg/kent
   fakesentry:
     build:
       context: docker/images/fakesentry
-    image: local/tecken_fakesentry
+    image: local/obs-common-fakesentry
     ports:
       - "${EXPOSE_SENTRY_PORT:-8090}:8090"
     command: run --host 0.0.0.0 --port 8090

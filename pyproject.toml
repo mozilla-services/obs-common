@@ -23,6 +23,7 @@ service-status = "obs_common.service_status:main"
 gcs-cli = "obs_common.gcs_cli:gcs_group"
 pubsub-cli = "obs_common.pubsub_cli:pubsub_group"
 sentry-wrap = "obs_common.sentry_wrap:cli_main"
+waitfor = "obs_common.waitfor:main"
 
 [build-system]
 requires = ["setuptools", "setuptools_scm[toml]>=6.2"]

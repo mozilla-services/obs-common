@@ -59,6 +59,8 @@ def main(args=None):
                 if resp.code in ok_codes:
                     sys.exit(0)
                 last_fail = f"HTTP status code: {resp.code}"
+        except ConnectionResetError as error:
+            last_fail = f"ConnectionResetError: {error}"
         except TimeoutError as error:
             last_fail = f"TimeoutError: {error}"
         except urllib.error.URLError as error:
