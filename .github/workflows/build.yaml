@@ -26,6 +26,7 @@ jobs:
         run: |
           python -m venv venv
           venv/bin/pip install -r requirements.txt
+          venv/bin/pip install -e . --no-deps
       - name: Verify requirements.txt
         if: ${{ matrix.python-version == '3.11' }}
         run: |
@@ -34,22 +35,18 @@ jobs:
       - name: Run lint check
         if: ${{ matrix.python-version == '3.11' }}
         run: |
-          venv/bin/ruff format --check obs_common tests
-          venv/bin/ruff check obs_common tests
+          PATH="venv/bin:$PATH" bin/lint.sh
       - name: Run tests
         env:
           SENTRY_DSN: http://public@localhost:8090/1
           STORAGE_EMULATOR_HOST: http://localhost:8001
+          PUBSUB_EMULATOR_HOST: localhost:5010
         run: |
-          docker compose up -d fakesentry gcs-emulator
-          venv/bin/pytest tests/
+          docker compose up -d fakesentry gcs-emulator pubsub
+          # Run outside docker because we are testing the matrix python version
+          PATH="venv/bin:$PATH" bin/test.sh
           # stop services immediate and ignore errors
           docker compose down -t0 || true
-      - name: License Check
-        if: ${{ matrix.python-version == '3.11' }}
-        run: |
-          venv/bin/pip install -e . --no-deps
-          venv/bin/license-check
 
   build-and-release:
     permissions:
