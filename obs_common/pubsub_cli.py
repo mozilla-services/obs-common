@@ -168,10 +168,5 @@ def pull(ctx, project_id, subscription_name, ack, max_messages):
         subscriber.acknowledge(subscription=subscription_path, ack_ids=ack_ids)
 
 
-def main(argv=None):
-    argv = argv or []
-    pubsub_group(argv)
-
-
 if __name__ == "__main__":
     pubsub_group()

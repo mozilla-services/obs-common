@@ -20,8 +20,8 @@ dynamic = ["version"]
 [project.scripts]
 license-check = "obs_common.license_check:main"
 service-status = "obs_common.service_status:main"
-gcs-cli = "obs_common.gcs_cli:main"
-pubsub-cli = "obs_common.pubsub_cli:main"
+gcs-cli = "obs_common.gcs_cli:gcs_group"
+pubsub-cli = "obs_common.pubsub_cli:pubsub_group"
 sentry-wrap = "obs_common.sentry_wrap:cli_main"
 
 [build-system]
