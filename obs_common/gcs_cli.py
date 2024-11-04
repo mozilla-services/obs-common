@@ -8,6 +8,7 @@
 
 # Usage: ./bin/gcs_cli.py CMD
 
+import os
 from pathlib import Path, PurePosixPath
 
 import click
@@ -18,6 +19,10 @@ from google.cloud.exceptions import Conflict, NotFound
 
 
 def get_client():
+    if "STORAGE_EMULATOR_HOST" not in os.environ:
+        raise click.ClickException(
+            "STORAGE_EMULATOR_HOST must point to gcs emulator, but it's not set."
+        )
     return storage.Client(credentials=AnonymousCredentials())
 
 
