@@ -16,4 +16,7 @@ updates:
     directory: "/docker"
     schedule:
       interval: "monthly"
+    ignore:
+      - dependency-name: python
+        versions: [">=3.12"]
 
