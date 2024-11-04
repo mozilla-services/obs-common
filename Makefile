@@ -42,6 +42,10 @@ devcontainer: .env .docker-build  ## | Run VS Code development container.
 rebuildreqs: .env .docker-build  ## | Rebuild requirements.txt file after requirements.in changes.
 	docker compose run --rm --no-deps shell pip-compile --allow-unsafe --generate-hashes --strip-extras --quiet
 
+.PHONY: updatereqs
+updatereqs: .env .docker-build  ## | Update deps in requirements.txt file.
+	docker compose run --rm --no-deps app shell pip-compile --generate-hashes --strip-extras --upgrade
+
 .PHONY: lint
 lint: .env .docker-build  ## | Lint code.
 	docker compose run --rm --no-deps shell bin/lint.sh

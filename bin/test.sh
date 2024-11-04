@@ -18,8 +18,8 @@ set -euo pipefail
 
 # Wait for services to be ready (both have the same endpoint url)
 echo ">>> wait for services"
-urlwait "http://${PUBSUB_EMULATOR_HOST}" 10
-urlwait "${STORAGE_EMULATOR_HOST}/storage/v1/b" 10
+waitfor --verbose "http://${PUBSUB_EMULATOR_HOST}"
+waitfor --verbose "${STORAGE_EMULATOR_HOST}/storage/v1/b"
 waitfor --verbose --codes=200,404 "${SENTRY_DSN}"
 
 # Run tests
