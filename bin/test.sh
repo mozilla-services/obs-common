@@ -20,7 +20,7 @@ set -euo pipefail
 echo ">>> wait for services"
 waitfor --verbose "http://${PUBSUB_EMULATOR_HOST}"
 waitfor --verbose "${STORAGE_EMULATOR_HOST}/storage/v1/b"
-waitfor --verbose --codes=200,404 "${SENTRY_DSN}"
+waitfor --verbose --codes={200,404} "${SENTRY_DSN}"
 
 # Run tests
 echo ">>> pytest"
