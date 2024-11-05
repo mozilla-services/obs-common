@@ -21,7 +21,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Python dependencies
-COPY --chown=app:ap requirements.txt /app/
+COPY --chown=app:app requirements.txt /app/
 
 RUN pip install -U 'pip>=20' && \
     pip install --no-cache-dir --no-deps --only-binary :all: -r requirements.txt && \
