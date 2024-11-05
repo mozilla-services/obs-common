@@ -15,8 +15,26 @@ import argparse
 import urllib.error
 import urllib.request
 from urllib.parse import urlsplit
+import socket
 import sys
 import time
+
+DEFAULT_PORTS = {
+    "amqp": 5672,
+    "http": 80,
+    "https": 443,
+    "mysql": 3306,
+    "mysql2": 3306,
+    "pgsql": 5432,
+    "postgres": 5432,
+    "postgresql": 5432,
+    "redis": 6379,
+    "hiredis": 6379,
+}
+NOOP_PROTOCOLS = {
+    "sqlite",
+    "sqlite3",
+}
 
 
 def main(args=None):
@@ -27,7 +45,18 @@ def main(args=None):
         )
     )
     parser.add_argument("--verbose", action="store_true")
-    parser.add_argument("--timeout", type=int, default=15, help="Wait timeout")
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=15,
+        help=(
+            "Seconds after which to stop retrying. This is separate from the timeout "
+            "for individual attempts, which is 5 seconds."
+        ),
+    )
+    parser.add_argument(
+        "--conn-only", action="store_true", help="Only check for connection."
+    )
     parser.add_argument(
         "--codes",
         default="200",
@@ -47,7 +76,20 @@ def main(args=None):
         parsed_url = parsed_url._replace(netloc=netloc)
         url = parsed_url.geturl()
 
-    if parsed.verbose:
+    if parsed_url.scheme in NOOP_PROTOCOLS:
+        if parsed.verbose:
+            print(f"Skipping because protocol {parsed_url.scheme} is noop")
+        sys.exit(0)
+
+    if parsed.conn_only:
+        host = parsed_url.hostname
+        port = parsed_url.port or DEFAULT_PORTS.get(parsed_url.scheme, None)
+        sock = (host, port)
+        if parsed.verbose:
+            print(
+                f"Testing {host}:{port} for connection with timeout {parsed.timeout}..."
+            )
+    elif parsed.verbose:
         print(f"Testing {url} for {ok_codes!r} with timeout {parsed.timeout}...")
 
     start_time = time.time()
@@ -55,10 +97,16 @@ def main(args=None):
     last_fail = ""
     while True:
         try:
-            with urllib.request.urlopen(url, timeout=5) as resp:
-                if resp.code in ok_codes:
-                    sys.exit(0)
-                last_fail = f"HTTP status code: {resp.code}"
+            if parsed.conn_only:
+                with socket.socket() as s:
+                    s.settimeout(5.0)
+                    s.connect(sock)
+                sys.exit(0)
+            else:
+                with urllib.request.urlopen(url, timeout=5) as resp:
+                    if resp.code in ok_codes:
+                        sys.exit(0)
+                    last_fail = f"HTTP status code: {resp.code}"
         except ConnectionResetError as error:
             last_fail = f"ConnectionResetError: {error}"
         except TimeoutError as error:
@@ -67,6 +115,15 @@ def main(args=None):
             if hasattr(error, "code") and error.code in ok_codes:
                 sys.exit(0)
             last_fail = f"URLError: {error}"
+        except socket.gaierror as error:
+            # This can mean that docker compose has not started the container, so the
+            # hostname can't be resolved (i.e. DNS failure).
+            # From docs https://docs.python.org/3/library/socket.html#socket.gaierror:
+            # A subclass of OSError, this exception is raised for address-related errors
+            # by getaddrinfo() and getnameinfo()
+            last_fail = f"socket.gaierror: {error}"
+        except ConnectionRefusedError as error:
+            last_fail = f"ConnectionRefusedError: {error}"
 
         if parsed.verbose:
             print(last_fail)

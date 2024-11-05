@@ -83,6 +83,16 @@ gcs-cli --help
 pubsub-cli --help
 ```
 
+## waitfor
+
+Performs GET requests against given URL until HTTP 200 or exceeds wait timeout.
+
+For command help:
+
+```shell
+waitfor --help
+```
+
 # History
 
 `service-status` and `licence-check` were moved here from https://github.com/willkg/socorro-release,
