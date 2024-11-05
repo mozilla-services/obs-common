@@ -45,7 +45,15 @@ def main(args=None):
         )
     )
     parser.add_argument("--verbose", action="store_true")
-    parser.add_argument("--timeout", type=int, default=15, help="Wait timeout")
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=15,
+        help=(
+            "Seconds after which to stop retrying. This is separate from the timeout "
+            "for individual attempts, which is 5 seconds."
+        ),
+    )
     parser.add_argument(
         "--conn-only", action="store_true", help="Only check for connection."
     )
@@ -91,6 +99,7 @@ def main(args=None):
         try:
             if parsed.conn_only:
                 with socket.socket() as s:
+                    s.settimeout(5.0)
                     s.connect(sock)
                 sys.exit(0)
             else:
@@ -113,6 +122,8 @@ def main(args=None):
             # A subclass of OSError, this exception is raised for address-related errors
             # by getaddrinfo() and getnameinfo()
             last_fail = f"socket.gaierror: {error}"
+        except ConnectionRefusedError as error:
+            last_fail = f"ConnectionRefusedError: {error}"
 
         if parsed.verbose:
             print(last_fail)
