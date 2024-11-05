@@ -9,63 +9,22 @@ This script looks at the ``/__version__`` endpoint information and tells you
 how far behind different server environments are from main tip.
 """
 
-import argparse
 import json
-import os
 import sys
 from urllib.parse import urlparse
 from urllib.request import urlopen
+from pathlib import Path
+
+import click
+import tomllib
 
 
 DESCRIPTION = """
-service-status.py tells you how far behind different server environments
-are from main tip.
+Report how far behind different server environments are from main tip.
+
+For options that are not specified, values are pulled from the [tool.service-status]
+section in the pyproject.toml file in the current working directory, if it exists.
 """
-
-DEFAULT_CONFIG = {
-    # The name of the main branch in the repository
-    "main_branch": "main",
-    # List of "label=host" for hosts that have a /__version__ to check
-    "hosts": [],
-}
-
-
-def get_config():
-    """Generates configuration.
-
-    This tries to pull configuration from the ``[tool.service-status]`` table
-    from a ``pyproject.toml`` file.
-
-    If neither exist, then it uses defaults.
-
-    :returns: configuration dict
-
-    """
-    my_config = dict(DEFAULT_CONFIG)
-
-    if os.path.exists("pyproject.toml"):
-        if sys.version_info >= (3, 11):
-            import tomllib
-        else:
-            try:
-                import tomli as tomllib
-            except ImportError:
-                print(
-                    "For Python <3.11, you need to install tomli to work with pyproject.toml "
-                    + "files."
-                )
-                tomllib = None
-
-        if tomllib is not None:
-            with open("pyproject.toml", "rb") as fp:
-                data = tomllib.load(fp)
-
-            config_data = data.get("tool", {}).get("service-status", {})
-            if config_data:
-                for key, default_val in my_config.items():
-                    my_config[key] = config_data.get(key, default_val)
-
-    return my_config
 
 
 def fetch(url, is_json=True):
@@ -141,43 +100,39 @@ class StdoutOutput:
         self.row()
 
 
-def main():
-    config = get_config()
+@click.command(help=DESCRIPTION)
+@click.option(
+    "--main-branch",
+    help=(
+        "The name of the main branch in the git repository. Defaults "
+        'to "main" if not configured in pyproject.toml.'
+    ),
+)
+@click.option(
+    "--host",
+    "hosts",
+    multiple=True,
+    help=(
+        "A list of hosts which have a ``/__version__`` Dockerflow endpoint in the "
+        "form of ENVIRONMENTNAME=HOST."
+    ),
+)
+def main(main_branch, hosts):
+    config_data = {}
+    if (pyproject_toml := Path("pyproject.toml")).exists():
+        data = tomllib.loads(pyproject_toml.read_text())
+        config_data = data.get("tool", {}).get("service-status", {})
 
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
-
-    # Add items that can be configured to argparse as configuration options.
-    # This makes it possible to specify or override configuration with command
-    # line arguments.
-    for key, val in config.items():
-        key_arg = key.replace("_", "-")
-        if isinstance(val, list):
-            parser.add_argument(
-                f"--{key_arg}",
-                default=val,
-                nargs="+",
-                metavar="VALUE",
-                help=f"override configuration {key}; defaults to {val!r}",
-            )
-        else:
-            default_val = val.replace("%", "%%")
-            parser.add_argument(
-                f"--{key_arg}",
-                default=val,
-                metavar="VALUE",
-                help=f"override configuration {key}; defaults to {default_val!r}",
-            )
-
-    args = parser.parse_args()
-
-    main_branch = args.main_branch
-    hosts = args.hosts
-
-    out = StdoutOutput()
+    if main_branch is None:
+        main_branch = config_data.get("main_branch", "main")
 
     if not hosts:
-        print("no hosts specified.")
-        return 1
+        if "hosts" in config_data:
+            hosts = config_data["hosts"]
+        else:
+            raise click.ClickException("no hosts configured")
+
+    out = StdoutOutput()
 
     current_section = ""
 
