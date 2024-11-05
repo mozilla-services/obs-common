@@ -21,15 +21,17 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Python dependencies
-COPY requirements.txt /app/
+COPY --chown=app:ap requirements.txt /app/
 
 RUN pip install -U 'pip>=20' && \
     pip install --no-cache-dir --no-deps --only-binary :all: -r requirements.txt && \
     pip install --no-cache-dir ipython && \
     pip check --disable-pip-version-check
 
-COPY . /app
+COPY --chown=app:app . /app
 
 RUN pip install -e . --no-deps
+
+USER app
 
 CMD ["/bin/bash"]
