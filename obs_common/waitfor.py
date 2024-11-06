@@ -11,13 +11,14 @@ timeout.
 Usage: bin/waitfor.py [--timeout T] [--verbose] [--codes CODES] URL
 """
 
-import argparse
 import urllib.error
 import urllib.request
 from urllib.parse import urlsplit
 import socket
 import sys
 import time
+
+import click
 
 DEFAULT_PORTS = {
     "amqp": 5672,
@@ -37,38 +38,34 @@ NOOP_PROTOCOLS = {
 }
 
 
-def main(args=None):
-    parser = argparse.ArgumentParser(
-        description=(
-            "Performs GET requests against given URL until HTTP 200 or exceeds "
-            "wait timeout."
-        )
+@click.command(
+    help=(
+        "Performs GET requests against given URL until HTTP 200 or exceeds "
+        "wait timeout."
     )
-    parser.add_argument("--verbose", action="store_true")
-    parser.add_argument(
-        "--timeout",
-        type=int,
-        default=15,
-        help=(
-            "Seconds after which to stop retrying. This is separate from the timeout "
-            "for individual attempts, which is 5 seconds."
-        ),
-    )
-    parser.add_argument(
-        "--conn-only", action="store_true", help="Only check for connection."
-    )
-    parser.add_argument(
-        "--codes",
-        default="200",
-        help="Comma-separated list of valid HTTP response codes",
-    )
-    parser.add_argument("url", help="URL to test")
-
-    parsed = parser.parse_args(args)
-
-    ok_codes = [int(code.strip()) for code in parsed.codes.split(",")]
-
-    url = parsed.url
+)
+@click.argument("url")
+@click.option("--verbose", is_flag=True)
+@click.option("--conn-only", is_flag=True, help="Only check for connection.")
+@click.option(
+    "--codes",
+    default=[200],
+    multiple=True,
+    show_default=True,
+    type=int,
+    help="Valid HTTP response codes. May be specified multiple times.",
+)
+@click.option(
+    "--timeout",
+    default=15,
+    show_default=True,
+    type=int,
+    help=(
+        "Seconds after which to stop retrying. This is separate from the timeout "
+        "for individual attempts, which is 5 seconds."
+    ),
+)
+def main(verbose, timeout, conn_only, codes, url):
     parsed_url = urlsplit(url)
     if "@" in parsed_url.netloc:
         netloc = parsed_url.netloc
@@ -77,43 +74,41 @@ def main(args=None):
         url = parsed_url.geturl()
 
     if parsed_url.scheme in NOOP_PROTOCOLS:
-        if parsed.verbose:
+        if verbose:
             print(f"Skipping because protocol {parsed_url.scheme} is noop")
-        sys.exit(0)
+        return
 
-    if parsed.conn_only:
+    if conn_only:
         host = parsed_url.hostname
         port = parsed_url.port or DEFAULT_PORTS.get(parsed_url.scheme, None)
         sock = (host, port)
-        if parsed.verbose:
-            print(
-                f"Testing {host}:{port} for connection with timeout {parsed.timeout}..."
-            )
-    elif parsed.verbose:
-        print(f"Testing {url} for {ok_codes!r} with timeout {parsed.timeout}...")
+        if verbose:
+            print(f"Testing {host}:{port} for connection with timeout {timeout}...")
+    elif verbose:
+        print(f"Testing {url} for {codes!r} with timeout {timeout}...")
 
     start_time = time.time()
 
     last_fail = ""
     while True:
         try:
-            if parsed.conn_only:
+            if conn_only:
                 with socket.socket() as s:
                     s.settimeout(5.0)
                     s.connect(sock)
-                sys.exit(0)
+                return
             else:
                 with urllib.request.urlopen(url, timeout=5) as resp:
-                    if resp.code in ok_codes:
-                        sys.exit(0)
+                    if resp.code in codes:
+                        return
                     last_fail = f"HTTP status code: {resp.code}"
         except ConnectionResetError as error:
             last_fail = f"ConnectionResetError: {error}"
         except TimeoutError as error:
             last_fail = f"TimeoutError: {error}"
         except urllib.error.URLError as error:
-            if hasattr(error, "code") and error.code in ok_codes:
-                sys.exit(0)
+            if hasattr(error, "code") and error.code in codes:
+                return
             last_fail = f"URLError: {error}"
         except socket.gaierror as error:
             # This can mean that docker compose has not started the container, so the
@@ -125,15 +120,14 @@ def main(args=None):
         except ConnectionRefusedError as error:
             last_fail = f"ConnectionRefusedError: {error}"
 
-        if parsed.verbose:
+        if verbose:
             print(last_fail)
 
         time.sleep(0.5)
 
         delta = time.time() - start_time
-        if delta > parsed.timeout:
-            print(f"Failed: {last_fail}, elapsed: {delta:.2f}s")
-            sys.exit(1)
+        if delta > timeout:
+            raise click.ClickException(f"Failed: {last_fail}, elapsed: {delta:.2f}s")
 
 
 if __name__ == "__main__":
