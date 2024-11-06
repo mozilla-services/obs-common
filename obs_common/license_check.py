@@ -8,15 +8,16 @@
 This script checks files for license headers.
 """
 
-import argparse
 import pathlib
 import subprocess
 import sys
 
+import click
+
 
 DESCRIPTION = (
-    "Checks files in specified directory for license headers. "
-    + "If you don't specify a target, it'll check all files in \"git ls-files\"."
+    "Check specified target files and directories for license headers. "
+    + 'If no targets are specified, check all files in "git ls-files".'
 )
 
 # From https://www.mozilla.org/en-US/MPL/2.0/
@@ -83,29 +84,19 @@ def has_license_header(path: pathlib.Path):
     return False
 
 
-def main(args=None):
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
-    parser.add_argument(
-        "-l", "--file-only", action="store_true", help="print files only"
-    )
-    parser.add_argument("--verbose", action="store_true", help="verbose output")
-    parser.add_argument("target", help="file or directory tree to check", nargs="?")
-
-    parsed = parser.parse_args(args)
-
-    if parsed.target:
-        target = pathlib.Path(parsed.target)
-        if not target.exists():
-            if not parsed.file_only:
-                print(f"Not a valid file or directory: {target}")
-            return 1
-
-        if target.is_file():
-            targets = [target]
-
-        elif target.is_dir():
-            targets = list(target.rglob("*"))
-
+@click.command(help=DESCRIPTION)
+@click.argument(
+    "targets", nargs=-1, type=click.Path(exists=True, path_type=pathlib.Path)
+)
+@click.option("-l", "--file-only", is_flag=True, help="print files only")
+@click.option("--verbose", is_flag=True, help="verbose output")
+def main(targets, file_only, verbose):
+    if targets:
+        targets = [
+            target
+            for path in targets
+            for target in (path.rglob("*") if path.is_dir() else [path])
+        ]
     else:
         ret = subprocess.check_output(["git", "ls-files"])
         targets = [
@@ -116,17 +107,17 @@ def main(args=None):
 
     # Iterate through all the files in this target directory
     for path in targets:
-        if parsed.verbose:
+        if verbose:
             print(f"Checking {path}")
         if is_code_file(path) and not has_license_header(path):
             missing_headers += 1
-            if parsed.file_only:
+            if file_only:
                 print(str(path))
             else:
                 print(f"File {path} does not have license header.")
 
     if missing_headers > 0:
-        if not parsed.file_only:
+        if not file_only:
             print(f"Files with missing headers: {missing_headers}")
             print("")
             print("Add this:")
@@ -134,7 +125,7 @@ def main(args=None):
             print("\n".join(MPLV2))
         return 1
 
-    if not parsed.file_only:
+    if not file_only:
         print("No files missing headers.")
 
     return 0
