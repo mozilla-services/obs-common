@@ -123,8 +123,7 @@ def main(main_branch, hosts):
         data = tomllib.loads(pyproject_toml.read_text())
         config_data = data.get("tool", {}).get("service-status", {})
 
-    if main_branch is None:
-        main_branch = config_data.get("main_branch", "main")
+    main_branch = main_branch or config_data.get("main_branch", "main")
 
     if not hosts:
         if "hosts" in config_data:
