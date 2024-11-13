@@ -76,7 +76,7 @@ def delete_bucket(bucket_name):
     click.echo(f"GCS bucket {bucket_name!r} deleted.")
 
 
-@gcs_group.command("list_buckets")
+@gcs_group.command()
 @click.option("--details/--no-details", default=True, type=bool, help="With details")
 def list_buckets(details):
     """List GCS buckets"""
@@ -92,7 +92,7 @@ def list_buckets(details):
             click.echo(f"{bucket.name}")
 
 
-@gcs_group.command("list_objects")
+@gcs_group.command()
 @click.option("--details/--no-details", default=True, type=bool, help="With details")
 @click.argument("bucket_name")
 def list_objects(bucket_name, details):
@@ -118,7 +118,7 @@ def list_objects(bucket_name, details):
         click.echo("No objects in bucket.")
 
 
-@gcs_group.command("upload")
+@gcs_group.command()
 @click.argument("source")
 @click.argument("destination")
 def upload(source, destination):

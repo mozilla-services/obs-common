@@ -22,7 +22,7 @@ def pubsub_group():
     """Local dev environment Pub/Sub emulator manipulation script."""
 
 
-@pubsub_group.command("list_topics")
+@pubsub_group.command()
 @click.argument("project_id")
 @click.pass_context
 def list_topics(ctx, project_id):
@@ -34,7 +34,7 @@ def list_topics(ctx, project_id):
         click.echo(topic.name)
 
 
-@pubsub_group.command("list_subscriptions")
+@pubsub_group.command()
 @click.argument("project_id")
 @click.argument("topic_name")
 @click.pass_context
@@ -48,7 +48,7 @@ def list_subscriptions(ctx, project_id, topic_name):
         click.echo(subscription)
 
 
-@pubsub_group.command("create_topic")
+@pubsub_group.command()
 @click.argument("project_id")
 @click.argument("topic_name")
 @click.pass_context
@@ -64,7 +64,7 @@ def create_topic(ctx, project_id, topic_name):
         click.echo("Topic already created.")
 
 
-@pubsub_group.command("create_subscription")
+@pubsub_group.command()
 @click.argument("project_id")
 @click.argument("topic_name")
 @click.argument("subscription_name")
@@ -83,7 +83,7 @@ def create_subscription(ctx, project_id, topic_name, subscription_name):
         click.echo("Subscription already created.")
 
 
-@pubsub_group.command("delete_topic")
+@pubsub_group.command()
 @click.argument("project_id")
 @click.argument("topic_name")
 @click.pass_context
@@ -106,7 +106,7 @@ def delete_topic(ctx, project_id, topic_name):
         click.echo(f"Topic {topic_name} does not exist.")
 
 
-@pubsub_group.command("publish")
+@pubsub_group.command()
 @click.argument("project_id")
 @click.argument("topic_name")
 @click.argument("crashids", nargs=-1)
@@ -138,7 +138,7 @@ def publish(ctx, project_id, topic_name, crashids):
         click.echo(future.result())
 
 
-@pubsub_group.command("pull")
+@pubsub_group.command()
 @click.argument("project_id")
 @click.argument("subscription_name")
 @click.option("--ack/--no-ack", is_flag=True, default=False)
