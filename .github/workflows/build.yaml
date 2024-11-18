@@ -83,7 +83,7 @@ jobs:
         uses: mozilla-it/deploy-actions/docker-push@v3.12.0
         with:
           local_image: local/obs-common-fakesentry:latest
-          image_repo_path: us-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cavendish-prod/fakesentry
+          image_repo_path: ${{ secrets.GCP_PROJECT_ID }}/cavendish-prod/fakesentry
           image_tag: ${{ env.RELEASE_TAG }}
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -91,7 +91,7 @@ jobs:
         uses: mozilla-it/deploy-actions/docker-push@v3.12.0
         with:
           local_image: local/obs-common-gcs-emulator:latest
-          image_repo_path: us-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cavendish-prod/gcs-emulator
+          image_repo_path: ${{ secrets.GCP_PROJECT_ID }}/cavendish-prod/gcs-emulator
           image_tag: ${{ env.RELEASE_TAG }}
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
