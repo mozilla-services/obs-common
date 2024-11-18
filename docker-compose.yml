@@ -46,7 +46,9 @@ services:
   # https://github.com/fsouza/fake-gcs-server
   # Fake GCP GCS server for local development and testing
   gcs-emulator:
-    image: fsouza/fake-gcs-server:1.49.2
+    build:
+      context: docker/images/gcs-emulator
+    image: local/obs-common-gcs-emulator
     command: -port 8001 -scheme http
     ports:
       - "${EXPOSE_GCS_EMULATOR_PORT:-8001}:8001"
@@ -54,8 +56,9 @@ services:
   # https://cloud.google.com/sdk/docs/downloads-docker
   # official pubsub emulator
   pubsub:
-    # also available as google/cloud-sdk:<version>-emulators
-    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:463.0.0-emulators
+    build:
+      context: docker/images/pubsub-emulator
+    image: local/obs-common-pubsub-emulator
     command:
       - gcloud
       - beta
