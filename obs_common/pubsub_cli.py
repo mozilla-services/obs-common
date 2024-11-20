@@ -122,7 +122,11 @@ def publish(ctx, project_id, topic_name, crashids):
 
     # Pull crash ids from stdin if there are any
     if not crashids and not sys.stdin.isatty():
-        crashids = list(click.get_text_stream("stdin").readlines())
+        crashids = [
+            line.strip()
+            for line in click.get_text_stream("stdin").readlines()
+            if line.strip()  # ignore empty lines
+        ]
 
     if not crashids:
         raise click.BadParameter(
