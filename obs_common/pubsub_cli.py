@@ -123,9 +123,9 @@ def publish(ctx, project_id, topic_name, crashids):
     # Pull crash ids from stdin if there are any
     if not crashids and not sys.stdin.isatty():
         crashids = [
-            line.strip()
-            for line in click.get_text_stream("stdin").readlines()
-            if line.strip()  # ignore empty lines
+            stripped
+            for line in click.get_text_stream("stdin")
+            if (stripped := line.strip())  # ignore empty lines
         ]
 
     if not crashids:
