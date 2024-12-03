@@ -5,6 +5,6 @@ keyrings.google-artifactregistry-auth
 pip-tools==7.4.1
 pytest==8.3.3
 requests==2.32.3
-ruff==0.7.2
+ruff==0.8.1
 sentry-sdk==2.18.0
 twine==5.1.1
