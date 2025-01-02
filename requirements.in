@@ -1,6 +1,6 @@
 click==8.1.8
 google-cloud-pubsub==2.27.1
-google-cloud-storage==2.18.2
+google-cloud-storage==2.19.0
 keyrings.google-artifactregistry-auth
 pip-tools==7.4.1
 pytest==8.3.4
