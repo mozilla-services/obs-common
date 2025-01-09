@@ -35,4 +35,4 @@ def generate_tag():
     last_tag = max(tag_indices, default=None)
     if last_tag is None:
         return base_tag_name
-    return f"{base_tag_name}-{last_tag+1}"
+    return f"{base_tag_name}-{last_tag + 1}"
