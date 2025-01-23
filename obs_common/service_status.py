@@ -143,9 +143,10 @@ def main(main_branch, hosts):
         else:
             env_name, service = parts
 
-        if current_section != env_name:
-            out.section(env_name)
-            current_section = env_name
+        section_key = f"{env_name}: {service}"
+        if current_section != section_key:
+            out.section(section_key)
+            current_section = section_key
 
         service = service.rstrip("/")
         resp = fetch(f"{service}/__version__")
