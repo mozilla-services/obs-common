@@ -1,6 +1,6 @@
 # This should be kept in sync with the python version used in .devcontainer/Dockerfile and
 # docker/images/fakesentry/Dockerfile
-FROM --platform=linux/amd64 python:3.11.11-slim-bullseye@sha256:9d6c8e7c36da7e7a77af6b503877fe0dece3aa239be502ecb62f3ac266ce6011
+FROM --platform=linux/amd64 python:3.11.11-slim-bookworm@sha256:42420f737ba91d509fc60d5ed65ed0492678a90c561e1fa08786ae8ba8b52eda
 
 # Set up user and group
 ARG groupid=10001
