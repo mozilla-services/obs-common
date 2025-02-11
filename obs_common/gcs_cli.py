@@ -166,5 +166,45 @@ def upload(source, destination):
         click.echo(f"Uploaded gs://{bucket_name}/{key}")
 
 
+@gcs_group.command()
+@click.argument("source")
+@click.argument("destination")
+def download(source, destination):
+    """Download files from a bucket
+
+    SOURCE is a path to a file or directory in the bucket. will recurse on directory trees
+
+    DESTINATION is a path to a file or directory on the local filesystem. If SOURCE is a
+    directory or DESTINATION ends with "/", then DESTINATION is treated as a directory.
+    """
+
+    client = get_client()
+
+    # remove protocol from destination if present
+    source = source.split("://", 1)[-1]
+    bucket_name, _, prefix = source.partition("/")
+    prefix_path = PurePosixPath(prefix)
+
+    try:
+        bucket = client.get_bucket(bucket_name)
+    except NotFound as e:
+        raise click.ClickException(f"GCS bucket {bucket_name!r} does not exist.") from e
+
+    destination_path = Path(destination)
+    for blob in bucket.list_blobs(prefix=prefix):
+        key = blob.name
+        if key != prefix:
+            # source is a directory so treat destination as a directory
+            path = destination_path / PurePosixPath(key).relative_to(prefix_path)
+        elif destination_path.is_dir():
+            # source is a file but destination is a directory, preserve file name
+            path = destination_path / prefix_path.name
+        else:
+            path = destination_path
+        # NOTE(relud): blob.download_to_filename hangs in dev, so create a new blob object
+        bucket.blob(key).download_to_filename(str(path))
+        click.echo(f"Downloaded gs://{bucket_name}/{key}")
+
+
 if __name__ == "__main__":
     gcs_group()
