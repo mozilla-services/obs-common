@@ -174,7 +174,8 @@ def download(source, destination):
     """Download files from a bucket
 
     SOURCE is a path to a file or directory in the bucket, for example
-    "gs://bucket/dir/" or "gs://bucket/path/to/file". Will recurse on directory trees.
+    "gs://bucket/path/to/file" or "gs://bucket/dir/". Must end in "/" to indicate a
+    directory. Will recurse on directory trees.
 
     DESTINATION is a path to a file or directory on the local filesystem. If SOURCE is a
     directory or DESTINATION ends with "/", then DESTINATION is treated as a directory.
@@ -182,9 +183,8 @@ def download(source, destination):
 
     client = get_client()
 
-    # remove protocol from destination if present
-    source = source.split("://", 1)[-1]
-    bucket_name, _, prefix = source.partition("/")
+    # remove protocol from source if present, then separate bucket and prefix
+    bucket_name, _, prefix = source.split("://", 1)[-1].partition("/")
     prefix_path = PurePosixPath(prefix)
 
     try:
@@ -192,21 +192,35 @@ def download(source, destination):
     except NotFound as e:
         raise click.ClickException(f"GCS bucket {bucket_name!r} does not exist.") from e
 
+    source_is_dir = not prefix or prefix.endswith("/")
+    if source_is_dir:
+        sources = [
+            # NOTE(relud): blob.download_to_filename hangs for blobs returned by
+            # list_blobs, so create a new blob object
+            bucket.blob(blob.name)
+            for blob in bucket.list_blobs(prefix=prefix)
+        ]
+        if not sources:
+            raise click.ClickException(f"No keys in {source!r}.")
+    else:
+        sources = [bucket.blob(prefix)]
+
     destination_path = Path(destination)
-    for blob in bucket.list_blobs(prefix=prefix):
-        key = blob.name
-        if key != prefix:
+    for blob in sources:
+        if source_is_dir:
             # source is a directory so treat destination as a directory
-            path = destination_path / PurePosixPath(key).relative_to(prefix_path)
+            path = destination_path / PurePosixPath(blob.name).relative_to(prefix_path)
         elif destination_path.is_dir():
             # source is a file but destination is a directory, preserve file name
             path = destination_path / prefix_path.name
         else:
             path = destination_path
         path.parent.mkdir(parents=True, exist_ok=True)
-        # NOTE(relud): blob.download_to_filename hangs in dev, so create a new blob object
-        bucket.blob(key).download_to_filename(str(path))
-        click.echo(f"Downloaded gs://{bucket_name}/{key}")
+        try:
+            blob.download_to_filename(str(path))
+        except NotFound as e:
+            raise click.ClickException(f"GCS blob does not exist: {source!r}") from e
+        click.echo(f"Downloaded gs://{bucket_name}/{blob.name}")
 
 
 if __name__ == "__main__":
