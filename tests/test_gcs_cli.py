@@ -160,14 +160,14 @@ def test_download_file_to_dir(gcs_helper, tmp_path):
 
 
 @REQUIRE_EMULATOR
-def test_download_dir_to_dir(gcs_helper, tmp_path):
+def test_download_root_to_dir(gcs_helper, tmp_path):
     """Test downloading a whole directory to a directory."""
     bucket = "test"
     key = uuid4().hex
     gcs_helper.upload(bucket, f"{key}/{key}", key)
-    path = tmp_path / key
+    path = tmp_path / key / key
     result = CliRunner().invoke(
-        gcs_group, ["download", f"gs://{bucket}/{key}", str(tmp_path.absolute())]
+        gcs_group, ["download", f"gs://{bucket}", str(tmp_path.absolute())]
     )
     assert result.exit_code == 0
     assert path.read_text() == key

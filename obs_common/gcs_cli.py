@@ -124,10 +124,11 @@ def list_objects(bucket_name, details):
 def upload(source, destination):
     """Upload files to a bucket
 
-    SOURCE is a path to a file or directory of files. will recurse on directory trees
+    SOURCE is a path to a file or directory of files. will recurse on directory trees.
 
-    DESTINATION is a path to a file or directory in the bucket. If SOURCE is a
-    directory or DESTINATION ends with "/", then DESTINATION is treated as a directory.
+    DESTINATION is a path to a file or directory in the bucket, for example
+    "gs://bucket/dir/" or "gs://bucket/path/to/file". If SOURCE is a directory or DESTINATION
+    ends with "/", then DESTINATION is treated as a directory.
     """
 
     client = get_client()
@@ -172,7 +173,8 @@ def upload(source, destination):
 def download(source, destination):
     """Download files from a bucket
 
-    SOURCE is a path to a file or directory in the bucket. will recurse on directory trees
+    SOURCE is a path to a file or directory in the bucket, for example
+    "gs://bucket/dir/" or "gs://bucket/path/to/file". Will recurse on directory trees.
 
     DESTINATION is a path to a file or directory on the local filesystem. If SOURCE is a
     directory or DESTINATION ends with "/", then DESTINATION is treated as a directory.
@@ -201,6 +203,7 @@ def download(source, destination):
             path = destination_path / prefix_path.name
         else:
             path = destination_path
+        path.parent.mkdir(parents=True, exist_ok=True)
         # NOTE(relud): blob.download_to_filename hangs in dev, so create a new blob object
         bucket.blob(key).download_to_filename(str(path))
         click.echo(f"Downloaded gs://{bucket_name}/{key}")
