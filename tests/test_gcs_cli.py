@@ -161,13 +161,58 @@ def test_download_file_to_dir(gcs_helper, tmp_path):
 
 @REQUIRE_EMULATOR
 def test_download_root_to_dir(gcs_helper, tmp_path):
-    """Test downloading a whole directory to a directory."""
+    """Test downloading a whole bucket to a directory."""
     bucket = "test"
     key = uuid4().hex
     gcs_helper.upload(bucket, f"{key}/{key}", key)
-    path = tmp_path / key / key
     result = CliRunner().invoke(
         gcs_group, ["download", f"gs://{bucket}", str(tmp_path.absolute())]
     )
     assert result.exit_code == 0
-    assert path.read_text() == key
+    assert (tmp_path / key / key).read_text() == key
+
+
+@REQUIRE_EMULATOR
+def test_download_dir_to_dir(gcs_helper, tmp_path):
+    """Test downloading a whole directory to a directory."""
+    bucket = "test"
+    key = uuid4().hex
+    # one file that should be downloaded, and another than shouldn't
+    gcs_helper.upload(bucket, f"{key}/{key}", key)
+    gcs_helper.upload(bucket, f"{key}_{key}", key)
+    result = CliRunner().invoke(
+        gcs_group, ["download", f"gs://{bucket}/{key}/", str(tmp_path.absolute() / key)]
+    )
+    assert result.exit_code == 0
+    assert (tmp_path / key / key).read_text() == key
+    assert not (tmp_path / f"{key}_{key}").exists()
+
+
+@REQUIRE_EMULATOR
+def test_download_missing_file(gcs_helper, tmp_path):
+    """Test downloading a file that doesn't exist."""
+    bucket = "test"
+    key = uuid4().hex
+    # file that should not be downloaded because the source should be a file
+    gcs_helper.upload(bucket, f"{key}/{key}", key)
+    result = CliRunner().invoke(
+        gcs_group,
+        ["download", source := f"gs://{bucket}/{key}", str(tmp_path.absolute())],
+    )
+    assert result.exit_code == 1
+    assert result.stdout == f"Error: GCS blob does not exist: {source!r}\n"
+
+
+@REQUIRE_EMULATOR
+def test_download_missing_dir(gcs_helper, tmp_path):
+    """Test downloading a file that doesn't exist."""
+    bucket = "test"
+    key = uuid4().hex
+    # file that should not be downloaded because the source should be a directory
+    gcs_helper.upload(bucket, f"{key}", key)
+    result = CliRunner().invoke(
+        gcs_group,
+        ["download", source := f"gs://{bucket}/{key}/", str(tmp_path.absolute())],
+    )
+    assert result.exit_code == 1
+    assert result.stdout == f"Error: No keys in {source!r}.\n"
