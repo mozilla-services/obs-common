@@ -4,10 +4,6 @@
 #
 #    pip-compile --allow-unsafe --generate-hashes --strip-extras
 #
-backports-tarfile==1.2.0 \
-    --hash=sha256:77e284d754527b01fb1e6fa8a1afe577858ebe4e9dad8919e34c862cb399bc34 \
-    --hash=sha256:d75e02c268746e1b8144c278978b6e98e85de6ad16f8e4b0844a154557eca991
-    # via jaraco-context
 build==1.2.2.post1 \
     --hash=sha256:1d61c0887fa860c01971625baae8bdd338e517b836a2f70dd1f7aa3a6b2fc5b5 \
     --hash=sha256:b36993e92ca9375a219c99e606a122ff365a760a2d4bba0caa09bd5278b608b7
@@ -250,17 +246,17 @@ google-auth==2.38.0 \
     #   google-cloud-pubsub
     #   google-cloud-storage
     #   keyrings-google-artifactregistry-auth
-google-cloud-core==2.4.1 \
-    --hash=sha256:9b7749272a812bde58fff28868d0c5e2f585b82f37e09a1f6ed2d4d10f134073 \
-    --hash=sha256:a9e6a4422b9ac5c29f79a0ede9485473338e2ce78d91f2370c01e730eab22e61
+google-cloud-core==2.4.2 \
+    --hash=sha256:7459c3e83de7cb8b9ecfec9babc910efb4314030c56dd798eaad12c426f7d180 \
+    --hash=sha256:a4fcb0e2fcfd4bfe963837fad6d10943754fd79c1a50097d68540b6eb3d67f35
     # via google-cloud-storage
 google-cloud-pubsub==2.28.0 \
     --hash=sha256:76b41a322b43bc845fb06ffe238758726324d957d0161bae3ff4b14339da144b \
     --hash=sha256:904e894b4e15121521077ac85c9aa8f4e7b8517bc5fb409ddb2aac8df1a02b3c
     # via -r requirements.in
-google-cloud-storage==3.0.0 \
-    --hash=sha256:2accb3e828e584888beff1165e5f3ac61aa9088965eb0165794a82d8c7f95297 \
-    --hash=sha256:f85fd059650d2dbb0ac158a9a6b304b66143b35ed2419afec2905ca522eb2c6a
+google-cloud-storage==3.1.0 \
+    --hash=sha256:944273179897c7c8a07ee15f2e6466a02da0c7c4b9ecceac2a26017cb2972049 \
+    --hash=sha256:eaf36966b68660a9633f03b067e4a10ce09f1377cae3ff9f2c699f69a81c66c6
     # via -r requirements.in
 google-crc32c==1.6.0 \
     --hash=sha256:05e2d8c9a2f853ff116db9706b4a27350587f341eda835f46db3c0a8c8ce2f24 \
@@ -387,9 +383,7 @@ idna==3.10 \
 importlib-metadata==8.5.0 \
     --hash=sha256:45e54197d28b7a7f1559e60b95e7c567032b602131fbd588f1497f47880aa68b \
     --hash=sha256:71522656f0abace1d072b9e5481a48f07c138e00f079c38c8f883823f9c26bd7
-    # via
-    #   keyring
-    #   opentelemetry-api
+    # via opentelemetry-api
 iniconfig==2.0.0 \
     --hash=sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3 \
     --hash=sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374
