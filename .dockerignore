@@ -9,3 +9,4 @@ build
 dist/
 obs_common.egg-info/
 venv/
+.git
