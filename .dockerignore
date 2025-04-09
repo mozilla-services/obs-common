@@ -10,3 +10,6 @@ dist/
 obs_common.egg-info/
 venv/
 .git
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json
