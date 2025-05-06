@@ -69,8 +69,17 @@ jobs:
           venv/bin/pip install -r requirements.txt
       - name: Generate release tag
         run: echo RELEASE_TAG="$(venv/bin/python -c 'import obs_common.release; print(obs_common.release.generate_tag())')" >> "$GITHUB_ENV"
-      - name: Overrride dynamic version
-        run: sed 's/dynamic = \["version"]/# dynamic = ["version"]\nversion = "'"$RELEASE_TAG"'"/' -i pyproject.toml
+      - name: Overrride wheel version
+        run: |
+          # Convert version number to PEP 440-conformant version that's treated correctly
+          # by Dependabot, see https://mozilla-hub.atlassian.net/browse/CRINGE-24.
+          VERSION="${RELEASE_TAG#v}"
+          MAIN_VERSION="${VERSION%-*}"
+          case "$VERSION" in
+            *-*) SUBVERSION=".${VERSION##*-}";;
+            *) SUBVERSION="";;
+          esac
+          echo SETUPTOOLS_SCM_PRETEND_VERSION="$MAIN_VERSION$SUBVERSION" >> "$GITHUB_ENV"
       - name: Build python wheel
         run: venv/bin/python -m build
       - name: Build docker images for publishing
