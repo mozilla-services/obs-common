@@ -30,7 +30,8 @@ RUN pip install -U 'pip>=20' && \
 
 COPY --chown=app:app . /app
 
-RUN pip install -e . --no-deps
+ARG version=1.0
+RUN SETUPTOOLS_SCM_PRETEND_VERSION_FOR_OBS_COMMON=${version} pip install -e . --no-deps
 
 USER app
 
