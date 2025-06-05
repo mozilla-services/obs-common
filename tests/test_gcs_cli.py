@@ -200,7 +200,7 @@ def test_download_missing_file(gcs_helper, tmp_path):
         ["download", source := f"gs://{bucket}/{key}", str(tmp_path.absolute())],
     )
     assert result.exit_code == 1
-    assert result.stdout == f"Error: GCS blob does not exist: {source!r}\n"
+    assert result.stderr == f"Error: GCS blob does not exist: {source!r}\n"
 
 
 @REQUIRE_EMULATOR
@@ -215,4 +215,4 @@ def test_download_missing_dir(gcs_helper, tmp_path):
         ["download", source := f"gs://{bucket}/{key}/", str(tmp_path.absolute())],
     )
     assert result.exit_code == 1
-    assert result.stdout == f"Error: No keys in {source!r}.\n"
+    assert result.stderr == f"Error: No keys in {source!r}.\n"
