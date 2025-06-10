@@ -4,7 +4,7 @@ google-cloud-storage==3.1.0
 keyrings.google-artifactregistry-auth
 pip-tools==7.4.1
 pytest==8.3.5
-requests==2.32.3
+requests==2.32.4
 ruff==0.11.12
 sentry-sdk==2.29.1
 twine==6.1.0
