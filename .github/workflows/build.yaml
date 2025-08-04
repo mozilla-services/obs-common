@@ -83,6 +83,7 @@ jobs:
       - name: Build python wheel
         run: venv/bin/python -m build
       - name: Build docker images for publishing
+        shell: bash
         run: |
           docker compose build fakesentry gcs-emulator
           GAR_REPO="us-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cavendish-prod"
@@ -90,8 +91,7 @@ jobs:
           docker tag local/obs-common-fakesentry:latest "$FAKESENTRY_TAG"
           GCS_EMULATOR_TAG=$GAR_REPO/gcs-emulator:${{ env.RELEASE_TAG }}"
           docker tag local/obs-common-gcs-emulator:latest "$GCS_EMULATOR_TAG"
-          echo DOCKER_IMAGE_TAGS="$FAKESENTRY_TAG
-          $GCS_EMULATOR_TAG" >> "$GITHUB_ENV"
+          echo -e DOCKER_IMAGE_TAGS="$FAKESENTRY_TAG\n$GCS_EMULATOR_TAG" >> "$GITHUB_ENV"
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
