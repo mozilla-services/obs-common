@@ -89,7 +89,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: artifact-writer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       - name: Push fakesentry Docker image to GAR
-        uses: mozilla-it/deploy-actions/docker-push@v4.0.0
+        uses: mozilla-it/deploy-actions/docker-push@v4.0.6
         with:
           local_image: local/obs-common-fakesentry:latest
           image_repo_path: ${{ secrets.GCP_PROJECT_ID }}/cavendish-prod/fakesentry
@@ -97,7 +97,7 @@ jobs:
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Push gcs-emulator Docker image to GAR
-        uses: mozilla-it/deploy-actions/docker-push@v4.0.0
+        uses: mozilla-it/deploy-actions/docker-push@v4.0.6
         with:
           local_image: local/obs-common-gcs-emulator:latest
           image_repo_path: ${{ secrets.GCP_PROJECT_ID }}/cavendish-prod/gcs-emulator
