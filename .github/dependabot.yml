@@ -5,12 +5,22 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        update-types: ["major", "minor", "patch"]
+      development-dependencies:
+        dependency-type: "development"
+        update-types: ["major", "minor", "patch"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
     rebase-strategy: "disabled"
+    groups:
+      all-dependencies:
+        update-types: ["major", "minor", "patch"]
 
   - package-ecosystem: "docker"
     directories:
@@ -21,4 +31,3 @@ updates:
     ignore:
       - dependency-name: python
         versions: [">=3.12"]
-
