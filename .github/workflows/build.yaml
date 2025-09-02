@@ -55,6 +55,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: test
     runs-on: ubuntu-latest
+    concurrency:
+      group: release
     steps:
       - uses: actions/checkout@v5
       - name: Fetch tags
