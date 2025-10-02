@@ -1,4 +1,4 @@
-FROM python:3.11.13-slim-bookworm@sha256:838ff46ae6c481e85e369706fa3dea5166953824124735639f3c9f52af85f319
+FROM python:3.11.13-slim-bookworm@sha256:3cefba85cd47b4ff9cd1daea162d567531069d307716a82ef07a4290e74f1e17
 
 ARG groupid=5000
 ARG userid=5000
