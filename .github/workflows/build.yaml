@@ -17,7 +17,7 @@ jobs:
         python-version: ["3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
@@ -58,7 +58,7 @@ jobs:
     concurrency:
       group: release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Fetch tags
         run: git fetch --tags origin
       - name: Set up Python
@@ -101,7 +101,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: artifact-writer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       - name: Push fakesentry and gcs-emulator Docker images to GAR
-        uses: mozilla-it/deploy-actions/docker-push@v5.3.1
+        uses: mozilla-it/deploy-actions/docker-push@v6.1.0
         with:
           image_tags: ${{ env.DOCKER_IMAGE_TAGS }}
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
