@@ -101,7 +101,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: artifact-writer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       - name: Push fakesentry and gcs-emulator Docker images to GAR
-        uses: mozilla-it/deploy-actions/docker-push@v6.1.0
+        uses: mozilla-it/deploy-actions/docker-push@v6.2.2
         with:
           image_tags: ${{ env.DOCKER_IMAGE_TAGS }}
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
