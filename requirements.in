@@ -1,10 +1,10 @@
 click==8.3.1
 google-cloud-pubsub==2.34.0
-google-cloud-storage==3.7.0
+google-cloud-storage==3.8.0
 keyrings.google-artifactregistry-auth
 pip-tools==7.5.2
 pytest==9.0.2
 requests==2.32.5
-ruff==0.14.10
-sentry-sdk==2.48.0
+ruff==0.14.14
+sentry-sdk==2.51.0
 twine==6.2.0
