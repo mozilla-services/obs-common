@@ -1,6 +1,6 @@
 # This should be kept in sync with the python version used in .devcontainer/Dockerfile and
 # docker/images/fakesentry/Dockerfile
-FROM --platform=linux/amd64 python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+FROM --platform=linux/amd64 ghcr.io/astral-sh/uv:python3.11-bookworm-slim@sha256:4f5d923c9dcea037f57bda425dd209f3ec643da2f0b74227f68d09dab0b3bb36
 
 # Set up user and group
 ARG groupid=10001
@@ -20,19 +20,16 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install Python dependencies
-COPY --chown=app:app requirements.txt /app/
-
-RUN pip install -U 'pip>=20' && \
-    pip install --no-cache-dir --no-deps --only-binary :all: -r requirements.txt && \
-    pip install --no-cache-dir ipython && \
-    pip check --disable-pip-version-check
+USER app
 
 COPY --chown=app:app . /app
 
+# Install Python dependencies
 ARG version=1.0
-RUN SETUPTOOLS_SCM_PRETEND_VERSION_FOR_OBS_COMMON=${version} pip install -e . --no-deps
-
-USER app
+ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_OBS_COMMON=${version}
+RUN --mount=type=cache,uid=$userid,gid=$groupid,target=/home/app/.cache/uv \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync
+ENV PATH="/app/.venv/bin:$PATH"
 
 CMD ["/bin/bash"]

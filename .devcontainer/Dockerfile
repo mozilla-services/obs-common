@@ -9,7 +9,6 @@ WORKDIR /app
 
 # add a non-privileged user for installing and running the application
 # We use --non-unique in case $groupid/$userid collide with the existing "vscode" user.
-# useradd -g app --uid $userid --non-unique --shell /usr/sbin/nologin --create-home app && \
 RUN groupadd --gid $groupid --non-unique app && \
     useradd -g app --uid $userid --non-unique --shell /bin/bash --create-home app && \
     chown app:app /app/
@@ -18,9 +17,17 @@ RUN groupadd --gid $groupid --non-unique app && \
 RUN apt-get update && \
     apt-get install -y ripgrep tig
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+USER app
+
+COPY --chown=app:app . /app
+
 # Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install -U 'pip>=20' && \
-    pip install --no-cache-dir --no-deps --only-binary :all: -r requirements.txt && \
-    pip install --no-cache-dir ipython && \
-    pip check --disable-pip-version-check
+ARG version=1.0
+ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_OBS_COMMON=${version}
+RUN --mount=type=cache,uid=$userid,gid=$groupid,target=/home/app/.cache/uv \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync
+ENV PATH="/app/.venv/bin:$PATH"

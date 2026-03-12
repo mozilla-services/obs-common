@@ -1,6 +1,6 @@
 # obs-common
 
-code and commands shared between obs-team repositories
+Code and commands shared between Crash ingestion service repositories
 
 ## service-status
 

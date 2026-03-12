@@ -17,9 +17,9 @@ shell *args:
 devcontainer:
     docker compose up --detach devcontainer
 
-# Rebuild requirements.txt file after requirements.in changes.
-rebuild-reqs *args:
-    docker compose run --rm --no-deps shell pip-compile --allow-unsafe --generate-hashes --strip-extras {{args}}
+# Run uv inside the container
+uv *args:
+	docker compose run --rm --no-deps shell uv {{args}}
 
 # Lint code, or use --fix to reformat and apply auto-fixes for lint.
 lint *args:

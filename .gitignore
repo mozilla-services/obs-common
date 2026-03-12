@@ -1,11 +1,11 @@
 *.py[co]
 *.sw[po]
-.docker-build
 .DS_Store
 .env
 .pytest_cache
 .python-version
-build
+.venv/
+build/
 dist/
 obs_common.egg-info/
-venv/
+uv.lock

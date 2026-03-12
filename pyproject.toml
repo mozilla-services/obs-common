@@ -1,7 +1,8 @@
 [project]
 name = "obs-common"
-description = "code shared between obs-team repositories"
-license = {file = "LICENSE"}
+description = "code shared between Mozilla crash ingestion repositories"
+license = "MPL-2.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
@@ -10,14 +11,21 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-dependencies = [
-  "click",
-  "google-cloud-pubsub",
-  "google-cloud-storage",
-  "requests",
-  "sentry-sdk",
-]
 dynamic = ["version"]
+dependencies = [
+    "click",
+    "google-cloud-pubsub",
+    "google-cloud-storage",
+    "sentry-sdk",
+]
+
+[dependency-groups]
+dev = [
+    "ipython",
+    "pytest",
+    "requests",
+    "ruff"
+]
 
 [project.scripts]
 license-check = "obs_common.license_check:main"
@@ -31,15 +39,16 @@ waitfor = "obs_common.waitfor:main"
 requires = ["setuptools", "setuptools_scm[toml]>=8.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.distutils.bdist_wheel]
-universal = true
-
 [tool.setuptools]
 packages = ["obs_common"]
 
 [tool.setuptools_scm]
 # Empty is fine
 
+[[tool.uv.index]]
+name = "cavendish"
+url = "https://us-python.pkg.dev/moz-fx-cavendish-prod/cavendish-prod-python/simple/"
+publish-url = "https://us-python.pkg.dev/moz-fx-cavendish-prod/cavendish-prod-python/"
 
 [tool.ruff]
 line-length = 88
