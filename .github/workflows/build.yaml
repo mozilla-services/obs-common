@@ -23,23 +23,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: |
-          uv sync
+        run: uv sync
       - name: Run lint check
         if: ${{ matrix.python-version == '3.11' }}
-        run: |
-          uv run bin/lint.sh
+        run: just lint
       - name: Run tests
-        env:
-          SENTRY_DSN: http://public@localhost:8090/1
-          STORAGE_EMULATOR_HOST: http://localhost:8001
-          PUBSUB_EMULATOR_HOST: localhost:5010
         run: |
-          docker compose up -d fakesentry gcs-emulator pubsub
-          # Run outside docker because we are testing the matrix python version
-          uv run bin/test.sh
+          just test
           # stop services immediate and ignore errors
-          docker compose down -t0 || true
+          just down -t0 || true
 
   build-and-release:
     permissions:
@@ -59,8 +51,7 @@ jobs:
         with:
           python-version: 3.11
       - name: Install dependencies
-        run: |
-          uv sync
+        run: uv sync
       - name: Generate release tag
         run: echo RELEASE_TAG="$(uv run python -c 'import obs_common.release; print(obs_common.release.generate_tag())')" >> "$GITHUB_ENV"
       - name: Overrride wheel version
@@ -78,7 +69,7 @@ jobs:
         run: uv build --wheel
       - name: Build docker images for publishing
         run: |
-          docker compose build fakesentry gcs-emulator
+          just build fakesentry gcs-emulator
           GAR_REPO="us-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cavendish-prod"
           FAKESENTRY_TAG="$GAR_REPO/fakesentry:${{ env.RELEASE_TAG }}"
           docker tag local/obs-common-fakesentry:latest "$FAKESENTRY_TAG"

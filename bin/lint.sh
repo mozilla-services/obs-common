@@ -25,12 +25,12 @@ if [[ "${1:-}" == "--help" ]]; then
     echo "  --fix   Reformat code."
 elif [[ "${1:-}" == "--fix" ]]; then
     echo ">>> ruff fix (${PYTHON_VERSION})"
-    ruff format $FILES
-    ruff check --fix $FILES
+    uvx ruff format $FILES
+    uvx ruff check --fix $FILES
 else
     echo ">>> ruff (${PYTHON_VERSION})"
-    ruff check $FILES
-    ruff format --check $FILES
+    uvx ruff check $FILES
+    uvx ruff format --check $FILES
 
     echo ">>> license check (${PYTHON_VERSION})"
     if [[ -d ".git" ]]; then
