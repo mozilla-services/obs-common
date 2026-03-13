@@ -73,7 +73,7 @@ jobs:
             *-*) SUBVERSION=".${VERSION##*-}";;
             *) SUBVERSION="";;
           esac
-          echo SETUPTOOLS_SCM_PRETEND_VERSION_FOR_OBS_COMMON="$MAIN_VERSION$SUBVERSION" >> "$GITHUB_ENV"
+          uv version "$MAIN_VERSION$SUBVERSION"
       - name: Build python wheel
         run: uv build --wheel
       - name: Build docker images for publishing

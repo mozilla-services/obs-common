@@ -25,8 +25,6 @@ USER app
 COPY --chown=app:app . /app
 
 # Install Python dependencies
-ARG version=1.0
-ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_OBS_COMMON=${version}
 RUN --mount=type=cache,uid=$userid,gid=$groupid,target=/home/app/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync

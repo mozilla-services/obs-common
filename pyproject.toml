@@ -1,5 +1,6 @@
 [project]
 name = "obs-common"
+version = "1.0"  # Will be overridden with the actual version in CI builds.
 description = "code shared between Mozilla crash ingestion repositories"
 license = "MPL-2.0"
 license-files = ["LICENSE"]
@@ -11,7 +12,6 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-dynamic = ["version"]
 dependencies = [
     "click",
     "google-cloud-pubsub",
@@ -36,14 +36,12 @@ sentry-wrap = "obs_common.sentry_wrap:cli_main"
 waitfor = "obs_common.waitfor:main"
 
 [build-system]
-requires = ["setuptools", "setuptools_scm[toml]>=8.0"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.10.9,<0.11.0"]
+build-backend = "uv_build"
 
-[tool.setuptools]
-packages = ["obs_common"]
-
-[tool.setuptools_scm]
-# Empty is fine
+[tool.uv.build-backend]
+module-name = "obs_common"
+module-root = ""
 
 [[tool.uv.index]]
 name = "cavendish"
