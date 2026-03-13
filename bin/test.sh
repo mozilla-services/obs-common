@@ -16,6 +16,15 @@
 
 set -euo pipefail
 
+# Set Pub/Sub library to use emulator
+export PUBSUB_EMULATOR_HOST="localhost:${EXPOSE_PUBSUB_EMULATOR_PORT:-5010}"
+
+# Set GCS library to use emulator
+export STORAGE_EMULATOR_HOST="http://localhost:${EXPOSE_GCS_EMULATOR_PORT:-8001}"
+
+# Set up fakesentry
+export SENTRY_DSN="http://public@localhost:${EXPOSE_SENTRY_PORT:-8090}/1"
+
 # Wait for services to be ready (both have the same endpoint url)
 echo ">>> wait for services"
 waitfor --verbose "http://${PUBSUB_EMULATOR_HOST}"

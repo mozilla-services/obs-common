@@ -9,22 +9,18 @@ _default:
 build *args:
     docker compose --progress plain build {{args}}
 
-# Open a shell in docker.
-shell *args:
-    docker compose run --rm shell {{args}}
+# Start Docker containers.
+up *args='--detach':
+    docker compose up {{args}}
 
-# Run VS Code development container.
-devcontainer:
-    docker compose up --detach devcontainer
-
-# Run uv inside the container
-uv *args:
-	docker compose run --rm --no-deps shell uv {{args}}
+# Stop and remove Docker containers.
+down *args:
+    docker compose down {{args}}
 
 # Lint code, or use --fix to reformat and apply auto-fixes for lint.
 lint *args:
-    docker compose run --rm --no-deps shell bin/lint.sh {{args}}
+    uv run bin/lint.sh {{args}}
 
 # Run tests.
-test *args:
-    docker compose run --rm shell bin/test.sh {{args}}
+test *args: up
+    uv run bin/test.sh {{args}}
