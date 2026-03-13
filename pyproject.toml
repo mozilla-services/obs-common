@@ -1,7 +1,9 @@
 [project]
 name = "obs-common"
-description = "code shared between obs-team repositories"
-license = {file = "LICENSE"}
+version = "1.0"  # Will be overridden with the actual version in CI builds.
+description = "code shared between Mozilla crash ingestion repositories"
+license = "MPL-2.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
@@ -11,13 +13,19 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-  "click",
-  "google-cloud-pubsub",
-  "google-cloud-storage",
-  "requests",
-  "sentry-sdk",
+    "click",
+    "google-cloud-pubsub",
+    "google-cloud-storage",
+    "sentry-sdk",
 ]
-dynamic = ["version"]
+
+[dependency-groups]
+dev = [
+    "ipython",
+    "pytest",
+    "requests",
+    "ruff"
+]
 
 [project.scripts]
 license-check = "obs_common.license_check:main"
@@ -28,18 +36,17 @@ sentry-wrap = "obs_common.sentry_wrap:cli_main"
 waitfor = "obs_common.waitfor:main"
 
 [build-system]
-requires = ["setuptools", "setuptools_scm[toml]>=8.0"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.10.9,<0.11.0"]
+build-backend = "uv_build"
 
-[tool.distutils.bdist_wheel]
-universal = true
+[tool.uv.build-backend]
+module-name = "obs_common"
+module-root = ""
 
-[tool.setuptools]
-packages = ["obs_common"]
-
-[tool.setuptools_scm]
-# Empty is fine
-
+[[tool.uv.index]]
+name = "cavendish"
+url = "https://us-python.pkg.dev/moz-fx-cavendish-prod/cavendish-prod-python/simple/"
+publish-url = "https://us-python.pkg.dev/moz-fx-cavendish-prod/cavendish-prod-python/"
 
 [tool.ruff]
 line-length = 88
