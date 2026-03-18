@@ -21,10 +21,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ipython",
     "pytest",
     "requests",
-    "ruff"
+    "ruff",
 ]
 
 [project.scripts]

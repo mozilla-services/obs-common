@@ -1,40 +1,4 @@
 services:
-  shell:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-      args:
-        userid: ${USE_UID:-10001}
-        groupid: ${USE_GID:-10001}
-    image: local/obs-common-shell
-    env_file:
-      - docker/config/local_dev.env
-    links:
-      - fakesentry
-      - gcs-emulator
-      - pubsub
-    volumes:
-      - .:/app
-      - /app/.venv
-
-  devcontainer:
-    build:
-      dockerfile: .devcontainer/Dockerfile
-      args:
-        userid: ${USE_UID:-10001}
-        groupid: ${USE_GID:-10001}
-    image: local/obs-common-devcontainer
-    entrypoint: ["sleep", "inf"]
-    env_file:
-      - docker/config/local_dev.env
-    links:
-      - fakesentry
-      - gcs-emulator
-      - pubsub
-    volumes:
-      - .:/app
-      - /app/.venv
-
   # https://github.com/willkg/kent
   fakesentry:
     build:
