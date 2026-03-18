@@ -18,24 +18,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m venv venv
-          venv/bin/pip install -r requirements.txt
-          venv/bin/pip install -e . --no-deps
-      - name: Verify requirements.txt
-        if: ${{ matrix.python-version == '3.11' }}
-        run: |
-          venv/bin/pip-compile --quiet --allow-unsafe --generate-hashes --strip-extras
-          git diff --exit-code -- requirements.txt
+          uv sync
       - name: Run lint check
         if: ${{ matrix.python-version == '3.11' }}
         run: |
-          PATH="venv/bin:$PATH" bin/lint.sh
+          uv run bin/lint.sh
       - name: Run tests
         env:
           SENTRY_DSN: http://public@localhost:8090/1
@@ -44,7 +37,7 @@ jobs:
         run: |
           docker compose up -d fakesentry gcs-emulator pubsub
           # Run outside docker because we are testing the matrix python version
-          PATH="venv/bin:$PATH" bin/test.sh
+          uv run bin/test.sh
           # stop services immediate and ignore errors
           docker compose down -t0 || true
 
@@ -61,16 +54,15 @@ jobs:
       - uses: actions/checkout@v6
       - name: Fetch tags
         run: git fetch --tags origin
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: 3.11
       - name: Install dependencies
         run: |
-          python -m venv venv
-          venv/bin/pip install -r requirements.txt
+          uv sync
       - name: Generate release tag
-        run: echo RELEASE_TAG="$(venv/bin/python -c 'import obs_common.release; print(obs_common.release.generate_tag())')" >> "$GITHUB_ENV"
+        run: echo RELEASE_TAG="$(uv run python -c 'import obs_common.release; print(obs_common.release.generate_tag())')" >> "$GITHUB_ENV"
       - name: Overrride wheel version
         run: |
           # Convert version number to PEP 440-conformant version that's treated correctly
@@ -81,9 +73,9 @@ jobs:
             *-*) SUBVERSION=".${VERSION##*-}";;
             *) SUBVERSION="";;
           esac
-          echo SETUPTOOLS_SCM_PRETEND_VERSION_FOR_OBS_COMMON="$MAIN_VERSION$SUBVERSION" >> "$GITHUB_ENV"
+          uv version "$MAIN_VERSION$SUBVERSION"
       - name: Build python wheel
-        run: venv/bin/python -m build
+        run: uv build --wheel
       - name: Build docker images for publishing
         run: |
           docker compose build fakesentry gcs-emulator
@@ -108,7 +100,8 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Publish python package
         run:
-          venv/bin/twine upload --verbose --repository-url https://us-python.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cavendish-prod-python/ dist/*.whl
+          uv tool install keyring --with keyrings.google-artifactregistry-auth
+          uv publish --index=cavendish --keyring-provider=subprocess --username=oauth2accesstoken
       - name: Publish release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

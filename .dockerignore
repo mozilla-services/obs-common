@@ -1,15 +1,15 @@
 *.py[co]
 *.sw[po]
-.docker-build
 .DS_Store
 .env
+.git/
 .pytest_cache
 .python-version
-build
+.venv/
+build/
 dist/
 obs_common.egg-info/
-venv/
-.git
+uv.lock
 
 # Ignore generated credentials from google-github-actions/auth
 gha-creds-*.json
