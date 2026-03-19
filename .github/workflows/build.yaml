@@ -92,7 +92,7 @@ jobs:
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Publish python package
-        run:
+        run: |
           uv tool install keyring --with keyrings.google-artifactregistry-auth
           uv publish --index=cavendish --keyring-provider=subprocess --username=oauth2accesstoken
       - name: Publish release
