@@ -71,7 +71,7 @@ jobs:
         run: uv build --wheel
       - name: Build docker images for publishing
         run: |
-          docker comppose build fakesentry gcs-emulator
+          docker compose build fakesentry gcs-emulator
           GAR_REPO="us-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cavendish-prod"
           FAKESENTRY_TAG="$GAR_REPO/fakesentry:${{ env.RELEASE_TAG }}"
           docker tag local/obs-common-fakesentry:latest "$FAKESENTRY_TAG"
