@@ -17,7 +17,7 @@ jobs:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
@@ -45,7 +45,7 @@ jobs:
     concurrency:
       group: release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Fetch tags
         run: git fetch --tags origin
       - name: Install uv
@@ -86,7 +86,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: artifact-writer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       - name: Push fakesentry and gcs-emulator Docker images to GAR
-        uses: mozilla-it/deploy-actions/docker-push@v6.6.1
+        uses: mozilla-it/deploy-actions/docker-push@v6.7.0
         with:
           image_tags: ${{ env.DOCKER_IMAGE_TAGS }}
           workload_identity_pool_project_number: ${{ vars.GCPV2_WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
