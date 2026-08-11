@@ -49,6 +49,28 @@ def create_bucket(bucket_name):
         click.echo(f"GCS bucket {bucket_name!r} created.")
 
 
+@gcs_group.command()
+@click.argument("bucket_name")
+@click.argument("topic_project")
+@click.argument("topic_name")
+@click.argument("event_types", nargs=-1, default=("OBJECT_FINALIZE",))
+def notification(bucket_name, topic_project, topic_name, event_types):
+    """Creates a Pub/Sub notification configuration for a bucket."""
+    client = get_client()
+    try:
+        bucket = client.get_bucket(bucket_name)
+    except NotFound:
+        click.echo(f"GCS bucket {bucket_name!r} does not exist.")
+        return
+    bucket.notification(
+        topic_project=topic_project,
+        topic_name=topic_name,
+        event_types=list(event_types),
+        payload_format="JSON_API_V1",
+    ).create()
+    click.echo(f"GCS notification for bucket {bucket_name!r} created.")
+
+
 @gcs_group.command("delete")
 @click.argument("bucket_name")
 def delete_bucket(bucket_name):
