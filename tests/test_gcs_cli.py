@@ -108,6 +108,32 @@ def test_create_notification(gcs_helper):
 
 
 @REQUIRE_EMULATOR
+def test_list_notifications(gcs_helper):
+    """Test listing notification configurations."""
+    bucket = gcs_helper.create_bucket("test").name
+
+    result = CliRunner().invoke(
+        gcs_group,
+        ["list-notifications", bucket],
+    )
+    assert result.exit_code == 0, result.output
+    assert result.output == (f"No notification configurations for bucket {bucket}.\n")
+
+    result = CliRunner().invoke(
+        gcs_group,
+        ["notification", bucket, "test-project", "test-topic"],
+    )
+    assert result.exit_code == 0
+
+    result = CliRunner().invoke(
+        gcs_group,
+        ["list-notifications", bucket],
+    )
+    assert result.exit_code == 0, result.output
+    assert result.output == ("test-project\ttest-topic\t['OBJECT_FINALIZE']\n")
+
+
+@REQUIRE_EMULATOR
 def test_upload_file_to_root(gcs_helper, tmp_path):
     """Test uploading one file to a bucket root."""
     bucket = gcs_helper.create_bucket("test").name
