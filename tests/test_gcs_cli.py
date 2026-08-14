@@ -73,6 +73,11 @@ class GcsHelper:
         blobs = list(self.client.list_blobs(bucket_or_name=bucket_name))
         return [blob.name for blob in blobs]
 
+    def list_notifications(self, bucket_name):
+        """Return the list of notification configurations for the given bucket."""
+        bucket = self.create_bucket(bucket_name)
+        return bucket.list_notifications()
+
 
 @pytest.fixture
 def gcs_helper():
@@ -85,6 +90,47 @@ def test_it_runs():
     runner = CliRunner()
     result = runner.invoke(gcs_group, ["--help"])
     assert result.exit_code == 0
+
+
+@REQUIRE_EMULATOR
+def test_create_notification(gcs_helper):
+    """Test creating a notification configuration type."""
+    bucket = gcs_helper.create_bucket("test").name
+    result = CliRunner().invoke(
+        gcs_group, ["notification", bucket, "test-project", "test-topic"]
+    )
+    assert result.exit_code == 0
+    [notification_config] = gcs_helper.list_notifications(bucket)
+    assert notification_config.topic_project == "test-project"
+    assert notification_config.topic_name == "test-topic"
+    assert notification_config.event_types == ["OBJECT_FINALIZE"]
+    assert notification_config.payload_format == "JSON_API_V1"
+
+
+@REQUIRE_EMULATOR
+def test_list_notifications(gcs_helper):
+    """Test listing notification configurations."""
+    bucket = gcs_helper.create_bucket("test").name
+
+    result = CliRunner().invoke(
+        gcs_group,
+        ["list-notifications", bucket],
+    )
+    assert result.exit_code == 0, result.output
+    assert result.output == (f"No notification configurations for bucket {bucket}.\n")
+
+    result = CliRunner().invoke(
+        gcs_group,
+        ["notification", bucket, "test-project", "test-topic"],
+    )
+    assert result.exit_code == 0
+
+    result = CliRunner().invoke(
+        gcs_group,
+        ["list-notifications", bucket],
+    )
+    assert result.exit_code == 0, result.output
+    assert result.output == ("test-project\ttest-topic\t['OBJECT_FINALIZE']\n")
 
 
 @REQUIRE_EMULATOR
