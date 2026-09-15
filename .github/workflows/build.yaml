@@ -73,9 +73,10 @@ jobs:
         run: |
           docker compose build fakesentry gcs-emulator
           GAR_REPO="us-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cavendish-prod"
-          FAKESENTRY_TAG="$GAR_REPO/fakesentry:${{ env.RELEASE_TAG }}"
+          # Dependabot doesn't understand version numbers starting with a "v", so we remove the v.
+          FAKESENTRY_TAG="$GAR_REPO/fakesentry:"${RELEASE_TAG#v}""
           docker tag local/obs-common-fakesentry:latest "$FAKESENTRY_TAG"
-          GCS_EMULATOR_TAG="$GAR_REPO/gcs-emulator:${{ env.RELEASE_TAG }}"
+          GCS_EMULATOR_TAG="$GAR_REPO/gcs-emulator:"${RELEASE_TAG#v}""
           docker tag local/obs-common-gcs-emulator:latest "$GCS_EMULATOR_TAG"
           echo "DOCKER_IMAGE_TAGS<<EOF
           $FAKESENTRY_TAG
