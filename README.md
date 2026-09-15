@@ -83,7 +83,8 @@ gcs-cli --help
 pubsub-cli --help
 ```
 
-To test these commands manually during development, you can set the `PUBSUB_EMULATOR_HOST` and `STORAGE_EMULATOR_HOST` environment variables, start the emulators and run the commands using `uv`
+To test these commands manually during development, you can set the `PUBSUB_EMULATOR_HOST` and
+`STORAGE_EMULATOR_HOST` environment variables, start the emulators and run the commands using `uv`:
 ```
 export PUBSUB_EMULATOR_HOST="localhost:${EXPOSE_PUBSUB_EMULATOR_PORT:-5010}"
 export STORAGE_EMULATOR_HOST="http://localhost:${EXPOSE_GCS_EMULATOR_PORT:-8001}"
