@@ -72,6 +72,6 @@ docstring-quotes = "double"
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    # Error happening in some OTel library code we can't change.
-    "ignore:SelectableGroups dict interface is deprecated\\. Use select\\.:DeprecationWarning",
+    # Google warns about Python 3.11 reaching end of life.
+    "ignore:You are using a Python version .*which Google will stop supporting in new releases of google\\.:FutureWarning:google\\.api_core\\._python_version_support",
 ]
